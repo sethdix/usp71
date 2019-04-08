@@ -1,0 +1,32 @@
+p {
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  margin: 3px 0 3px 0;
+  line-height: 20px;
+}
+
+.header {
+  font-size: large;
+  font-weight: bold;
+}
+
+.results {
+  color: green;
+}
+
+.small {
+  font-size: smaller;
+  font-weight: normal;
+}
+
+a {
+  text-decoration: none;
+}
+
+.button {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1rem;
+  border-radius: 15px;
+  border: 2px solid green;
+  color: green;
+  padding: 2px 0.25em;
+}

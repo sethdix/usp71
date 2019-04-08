@@ -1,0 +1,178 @@
+<p class="header">USP &lt;71&gt; sample test requirements <a title="current as of USP 41/NF 36 S1 
+click for the source code" href="https://github.com/sethdix/usp71helper" rel="noopener noreferrer" target="_blank"><span class="button">i</span></a>&nbsp;<a title="click to refresh" href="javascript:history.go(0)"><span class="button">&#8635;</span></a></p>
+
+<p>Sample type:
+  &nbsp;<select [(ngModel)]="sampleType">
+    <option *ngFor="let s of sampleTypes">{{s}}</option>
+  </select>
+</p>
+
+<p *ngIf="sampleType == 'Liquid' || sampleType == 'Solid'">
+  Container 
+  <ng-container *ngIf="sampleType == 'Liquid'">volume (mL):</ng-container>
+  <ng-container *ngIf="sampleType == 'Solid'">size (g):</ng-container>
+  &nbsp;<input type="number" [(ngModel)]='containerSize' />
+</p>
+
+<!--amount to be used-->
+<ng-container *ngIf="sampleType">
+<p class="header">
+  <span id="amount" *ngIf="(sampleType == 'Liquid' || sampleType == 'Solid') && containerSize">Minimum quantity to be used for each medium:&nbsp;</span>
+  <span id="amount" *ngIf="sampleType != 'Liquid' && sampleType != 'Solid'">Minimum quantity to be used for each medium:&nbsp;</span>
+  
+  <ng-container *ngIf="containerSize">
+    <ng-container *ngIf="sampleType == 'Liquid'">
+    <span class="results" *ngIf="containerSize && containerSize < 1">
+      Test the whole contents of each container.
+    </span>
+    <ng-container *ngIf="containerSize >= 1 && containerSize <= 40">
+      <span class="results" *ngIf="containerSize < 2">
+        at least 1 mL
+      </span>
+      <span class="results" *ngIf="containerSize >= 2">
+        {{containerSize / 2}} mL
+      </span>
+    </ng-container>
+
+    <span class="results" *ngIf="containerSize > 40 && containerSize <= 100">
+      20 mL
+    </span>
+
+    <ng-container *ngIf="containerSize > 100">
+      <span class="results" *ngIf="containerSize < 200">
+        NLT 20 mL
+      </span>
+      <span class="results" *ngIf="containerSize >= 200">
+        {{containerSize * 0.1}} mL
+      </span>
+    </ng-container>
+    </ng-container>
+    <ng-container *ngIf="sampleType == 'Solid'">
+      <span class="results" *ngIf="containerSize < 0.05">
+        Test the whole contents of each container.
+      </span>
+
+      <ng-container *ngIf="containerSize >= 0.05 && containerSize < 0.3">
+        <span class="results" *ngIf="containerSize > 0.1">{{containerSize / 2 * 1000}} mg</span>
+        <span class="results" *ngIf="containerSize <= 0.1">50 mg</span>
+      </ng-container>
+      <span class="results" *ngIf="containerSize >= 0.3 && containerSize <= 5">150 mg</span>
+      <span class="results" *ngIf="containerSize > 5">500 mg</span>
+    </ng-container>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Antibiotic liquid'">
+    <span class="results">1 mL</span>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Insoluble preparation/cream/ointment to be suspended or emulsified'">
+    <span class="results">Use the contents of each container to provide NLT 200 mg.</span>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Catgut or other surgical sutures for veterinary use'">
+    <span class="results">3 sections of a strand (each 30 cm long)</span>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Surgical dressing/cotton/gauze (in packages)'">
+    <span class="results">100 mg per package</span>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Sutures or other individually packaged single-use material'">
+    <span class="results">the whole device</span>
+  </ng-container>
+
+  <ng-container *ngIf="sampleType == 'Other medical devices'">
+    <span class="results">the whole device, cut into pieces or disassembled</span>
+  </ng-container> 
+</p>
+
+
+</ng-container>
+
+<p *ngIf="sampleType && sampleType != 'Catgut or other surgical sutures for veterinary use' && sampleType != 'Surgical dressing/cotton/gauze (in packages)' && sampleType != 'Sutures or other individually packaged single-use material' && sampleType != 'Other medical devices'">Preparation type:
+  &nbsp;<select [(ngModel)]="preparationType">
+    <option *ngFor="let p of preparationTypes(sampleType)">{{p}}</option>
+  </select>
+</p>
+
+<p *ngIf="preparationType=='Antibiotic solid'">
+  Preparation subtype:
+  &nbsp;<select [(ngModel)]="bulkType">
+    <option>Pharmacy bulk package</option>
+    <option>Bulk or blend</option>
+  </select>
+</p>
+
+<p>
+  Batch size:
+  &nbsp;<input type="number" [(ngModel)]='batchSize' />
+  <br /><span class="small">
+    If batch size is unknown, use the maximum number of items prescribed.
+  </span>
+</p>
+
+<!--number to be used-->
+<ng-container *ngIf="batchSize">
+<p class="header" *ngIf="preparationType && preparationTypes(sampleType)[0]!='Catgut or other surgical sutures for veterinary use' && preparationTypes(sampleType)[0]!='Non-injectable (other)'">
+  Minimum number of items to be tested for each medium:&nbsp;
+
+  <span class="results" *ngIf="preparationType == 'Parenteral' || preparationType == 'Ophthalmic or other non-injectable (single-dose container)'">
+    {{
+      (containerSize <= 100 ? 
+        batchSize <= 100 ?
+          roundUp(batchSize * 0.1) > 4 ? roundUp(batchSize * 0.1) : 4 :
+          batchSize <= 500 ? 10 :
+            roundUp(batchSize * 0.02) < 20 ? roundUp(batchSize * 0.02) : 20 :
+        roundUp(batchSize * 0.02) < 10 ? roundUp(batchSize * 0.02) : 10
+      ) + ' container(s)'
+    }}
+  </span>
+
+  <span class="results" *ngIf="preparationType == 'Antibiotic solid' && bulkType == 'Pharmacy bulk package'">
+    {{(containerSize < 5 ? 20 : 6) + ' containers'}}
+  </span>
+
+  <span class="results" *ngIf="preparationType == 'Ophthalmic or other non-injectable'">
+    {{(batchSize <= 200 ?
+        roundUp(batchSize * 0.05) > 2 ? roundUp(batchSize * 0.05) : 2 :
+        10) + ' containers'}}
+  </span>
+
+  <span class="results" *ngIf="preparationType == 'Bulk solid product' || bulkType == 'Bulk or blend'">
+    {{batchSize <= 4 ? 'each container' :
+      (batchSize <= 50 ? roundUp(batchSize * 0.2) > 4 ? roundUp(batchSize * 0.2) : 4 :
+      roundUp(batchSize * 0.02) > 10 ? roundUp(batchSize * 0.02) : 10) + ' containers'
+    }}
+  </span>
+
+  <br /><span class="small">
+    If the contents of one container are enough to inoculate the two media, this is the number of containers needed for testing both the media together.
+  </span>
+</p>
+
+<p class="header" *ngIf="preparationTypes(sampleType)[0]=='Catgut or other surgical sutures for veterinary use'">
+  Minimum number of items to be tested for each medium:&nbsp;
+  <span class="results">
+    {{(roundUp(batchSize * 0.02) <= 5 ? 5 : 
+      roundUp(batchSize * 0.02) > 20 ? 20 : roundUp(batchSize * 0.02)) + ' packages'
+    }}
+  </span>
+  <br /><span class="small">
+    If the contents of one container are enough to inoculate the two media, this is the number of containers needed for testing both the media together.
+  </span>
+</p>
+
+<p class="header" *ngIf="preparationTypes(sampleType)[0]=='Non-injectable (other)'">
+  Minimum number of items to be tested for each medium:&nbsp;
+  <span class="results">
+    {{(batchSize <= 100 ? roundUp(batchSize * 0.1) > 4 ? roundUp(batchSize * 0.1) : 4 :
+      batchSize <= 500 ? 10 :
+      roundUp(batchSize * 0.02) < 20 ? roundUp(batchSize * 0.02) : 20) + ' articles'
+    }}
+  </span>
+  <br /><span class="small">
+    If the contents of one container are enough to inoculate the two media, this is the number of containers needed for testing both the media together.
+  </span>
+</p>
+
+</ng-container>
